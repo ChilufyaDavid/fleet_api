@@ -1,0 +1,14 @@
+folder structure
+- API - External http request
+- Controllers - Code for hanling Business Logic
+- Middleware - Request Response Cycle handlers
+- Services - Interfaces with the database
+- Routes - 
+- Views
+- Config
+- Utils - General helper and utility functions like date and string modifiers etc
+- bin - Server setup
+
+==> Route ===> MiddleWare ==> Controller ==> Service
+
+Routes process middleware and/or ApIs, Middleware process APIs, Controllers, and Services, Controllers interface with Services, Services interface with database

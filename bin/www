@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('data-lens-backend:server');
 var http = require('http');
+const db = require('../config/db.config')
 
 /**
  * Get port from environment and store in Express.
@@ -48,6 +49,17 @@ function normalizePort(val) {
 
   return false;
 }
+
+// Test the database connection
+db.connect((err) => {
+  if(err) {
+    console.error('Error connecting to the database:', err);
+  } else {
+    console.log('connected to database');
+  }
+
+}); 
+
 
 /**
  * Event listener for HTTP server "error" event.

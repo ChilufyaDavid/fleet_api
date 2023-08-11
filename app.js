@@ -1,14 +1,20 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
+
+//var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var cron = require('node-cron');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-
+var { bgsAPI} = require('./api/bgsAPI');
+var units = require('./api/units') 
+var { processTrips } = require('./controllers/fleetController')
+var { fetchBGSToken } = require('./services/bgsService')
 var app = express();
 
+//var bgsAuth = 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -16,8 +22,16 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+//app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(async function(req, res, next){
+  //const token = await fetchBGSToken();
+ //await processTrips(token.data, "2023-08-08") //yyyy/mm/dd
+  //console.log(token);
+  
+  next()
+})
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -36,6 +50,14 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+var counter = 1;
+cron.schedule('* * * * *', () => {
+ // await bgsAPI.bgsAuth({
+   // authID: 'Zamtel',
+    //authPassword: 'Zamtel@123'
+  //})
+  console.log(`running a task every minute since ${counter++} minutes ago`);
 });
 
 module.exports = app;
