@@ -26,10 +26,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(async function(req, res, next){
-  //const token = await fetchBGSToken();
- //await processTrips(token.data, "2023-08-08") //yyyy/mm/dd
-  //console.log(token);
-  
+  const token = await fetchBGSToken();
+  await processTrips(token.data, "2023-08-11") //yyyy/mm/dd
+  console.log(token);
+  /* let weeks = ["2023-08-07","2023-08-08","2023-08-09","2023-08-10","2023-08-11","2023-08-12","2023-08-13"]
+  for(const index in weeks){
+    const token = await fetchBGSToken();
+    await processTrips(token.data, weeks[index]) //yyyy/mm/dd
+    console.log(`Done week ${index}`);
+  } */
   next()
 })
 

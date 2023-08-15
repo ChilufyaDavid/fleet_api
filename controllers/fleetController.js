@@ -1,11 +1,12 @@
-const { convertDateFormat, mySqlDateFormat,timeToSeconds, secondsToTime} = require('../utils/dateUtils')
+const { convertDateFormat, mySqlDateFormat,timeToSeconds, secondsToTime, getWeekNumber} = require('../utils/dateUtils')
 const { addTrip,addParking,addDrivesSummary } = require('../services/fleetService')
 const { fetchExternalData } = require('../services/bgsService')
 const dbConn = require('../config/db.config');
 const {  fetchDataFromExternalAPI } = require('../api/bgsAPI');
 
 async function processTrips(token, date) {
-    dbConn.query('SELECT * FROM units', async function(error, result){
+
+    dbConn.query('SELECT * FROM units', async function(error, unit){
         if(error){
             //send back error
             console.log("There was an error")
@@ -14,33 +15,37 @@ async function processTrips(token, date) {
         }else{
             
             console.log("Units fetched Success")
-            for(const unit in result){
+            for(const unit_index in unit){//for every unit, fetch external data
               
-                fetchExternalData(result[unit].itemId, token ,{'from':date, 'to': date}).then((drives_result) => {
-                    console.log(`Drives itemId : ${result[unit].itemId}, Date : ${date} }`)// this currently returns everything
+                fetchExternalData(unit[unit_index].item_id, token ,{'from':date, 'to': date}).
+                    then((bgs_data) => {// this currently returns everything
+                    //console.log(`Drives itemId : ${unit[unit_index].item_id}, Date : ${date} ${JSON.stringify(unit[unit_index])} `)
                     
-                    var drives = filterTripsByDate(drives_result.data, date);//returns trips for chosen date
+                    var drives = filterTripsByDate(bgs_data.data, date);//returns trips for chosen date
                     if(drives.length > 0){
                         //var last_trip = drives[drives.length-1];
                         addParking({
-                            'unit_id': result[unit].itemId,
+                            'unit_id': unit[unit_index].item_id,
                             'end_time': drives[drives.length-1].tripEndTime.split(' ')[1],
-                            'start_date':mySqlDateFormat(drives[drives.length-1].tripStartTime.split(' ')[0]),
-                            'end_date':mySqlDateFormat(drives[drives.length-1].tripEndTime.split(' ')[0]),
+                            'start_date':  date, //mySqlDateFormat(date),
+                            'end_date':  date, //mySqlDateFormat(drives[drives.length-1].tripEndTime.split(' ')[0]),
                             'on_time_status': drives[drives.length-1].tripEndTime.split(' ')[1] > "18:30",
-                            'location_status': 0
+                            'location_status': 0,
+                            'week': getWeekNumber(new Date(date)),
+                            'month': new Date(date).getMonth()+1
                         });
+
                         var drivesDuration = [];
 
                         for(const index in drives){
-                           // console.log(`Date : ${drives[index].tripStartTime}`)
+                           // -- console.log(`Date : ${drives[index].tripStartTime}`)
                            if(drives[index].tripStartTime.split(' ')[1] > "08:00" && drives[index].tripEndTime.split(' ')[1] < "18:30:00"){
                                 drivesDuration.push(drives[index].tripDuration);
                            }
                             
                            
                             addTrip({
-                                'unit_id': result[unit].itemId,
+                                'unit_id': unit[unit_index].item_id,
                                 'start_time' : drives[index].tripStartTime.split(' ')[1],//drives[index],
                                 'end_time': drives[index].tripEndTime.split(' ')[1],
                                 'start_date':mySqlDateFormat(drives[index].tripStartTime.split(' ')[0]) ,
@@ -56,21 +61,26 @@ async function processTrips(token, date) {
                                 'initial_mileage': drives[index].initialMileage.replace(/[^\d]/g, ""),
                                 'final_mileage': drives[index].finalMileage.replace(/[^\d]/g, ""),
                                 'max_speed': drives[index].maxSpeed.replace(/[^\d]/g, ""),
+                                'week': getWeekNumber(new Date(mySqlDateFormat(drives[index].tripStartTime.split(' ')[0]))),
+                                'month': new Date(mySqlDateFormat(drives[index].tripStartTime.split(' ')[0])).getMonth()+1
 
                             })
                         }
 
                         
                         const totalSeconds = drivesDuration.reduce((total, duration) => total + timeToSeconds(duration), 0);
-                        // console.log(`Day trips: ${timeToSeconds("9:30:00")} ${totalSeconds} ${((totalSeconds/timeToSeconds("9:30:00")) * 100).toFixed(2)} ${isFinite(((totalSeconds/timeToSeconds("9:30:00")) * 100).toFixed(2))}`)
+                        //-- console.log(`Day trips: ${timeToSeconds("9:30:00")} ${totalSeconds} ${((totalSeconds/timeToSeconds("9:30:00")) * 100).toFixed(2)} ${isFinite(((totalSeconds/timeToSeconds("9:30:00")) * 100).toFixed(2))}`)
 
                         var drivesSummary = {
-                            'unit_id': result[unit].itemId,
+                            'unit_id': unit[unit_index].item_id,
                             'drives' : drives.length,
                             'day_drives': drivesDuration.length,
                             'drives_duration': secondsToTime(totalSeconds),
                             'off_time': isFinite(((totalSeconds/timeToSeconds("9:30:00")) * 100).toFixed(2)) ? ((totalSeconds/timeToSeconds("9:30:00")) * 100).toFixed(2) : 0,//show percentage
-                            'date': date
+                            'date': date,
+                            'week': getWeekNumber(new Date(date)),
+                            'month': new Date(mySqlDateFormat(date)).getMonth()+1
+                
                         }
                         addDrivesSummary(drivesSummary);
 
@@ -88,11 +98,11 @@ function filterTripsByDate(trips, filterDate){
     console.log(`Filtered date called with trips : ${trips}`)
     const filteredTrips = trips.filter((trip) => {
       //const tripDate = convertDateTimeFormat(trip.tripStartTime);
-      console.log(`Converted Date : ${trip.tripStartTime}, ${new Date(convertDateFormat(trip.tripStartTime)).getDate()} ${new Date(convertDateFormat(trip.tripStartTime)).getDate() === new Date(filterDate).getDate()}`)
+      //--console.log(`Converted Date : ${trip.tripStartTime}, ${new Date(convertDateFormat(trip.tripStartTime)).getDate()} ${new Date(convertDateFormat(trip.tripStartTime)).getDate() === new Date(filterDate).getDate()}`)
       return (new Date(convertDateFormat(trip.tripStartTime)).getDate() === new Date(filterDate).getDate() )
     });
     //console.log(filteredTrips)
-    console.log(`Filtered date called return : ${filteredTrips}`)
+    //---console.log(`Filtered date called return : ${filteredTrips}`)
     return filteredTrips
   }
 

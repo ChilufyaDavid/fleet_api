@@ -33,11 +33,19 @@ function minutesToTime(minutes) {
   return `${hours.toString().padStart(2, "0")}:${remainingMinutes.toString().padStart(2, "0")}`;
 }
 
+function getWeekNumber(date) {
+  const startDate = new Date(date.getFullYear(), 0, 1); // January 1st of the same year
+  const daysPassed = Math.floor((date - startDate) / (24 * 60 * 60 * 1000)) + 1;
+  const weekNumber = Math.ceil(daysPassed / 7);
+  return weekNumber;
+}
+
 module.exports = {
     convertDateFormat,
     mySqlDateFormat,
     timeToSeconds,
     secondsToTime,
     timeToMinutes,
-    minutesToTime
+    minutesToTime,
+    getWeekNumber
 }

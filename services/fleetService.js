@@ -69,7 +69,7 @@ function apiUtilityDrives() {
         }else{
             //send back success
             //console.log(`Hurray ${result}`)
-            console.log(`Drives imported successfuly ${JSON.stringify(result)}`)
+           // console.log(`Drives imported successfuly ${JSON.stringify(result)}`)
             return result
         }
     });

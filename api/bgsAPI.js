@@ -27,8 +27,8 @@ async function bgsAuth(creds) {
 async function fetchDataFromExternalAPI(accessToken, unitId, date){
   try {
     var response = await axiosInstance.post('reports/get-reports',{
-      "from":"2022-11-01",//"2023-07-15",
-      "to": "2022-11-16",//date.to,
+      "from":date.from,//"2023-07-15",
+      "to": date.to,//date.to,
       "unitId":Number(unitId)
     },{
       headers: { Authorization: `Bearer ${accessToken}`,'Content-Type': 'application/json'},
