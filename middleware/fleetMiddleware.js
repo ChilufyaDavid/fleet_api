@@ -63,7 +63,7 @@ const getTrips = (req, res, next) => {
             //console.log(`Hurray ${result}`)
            // console.log(`Drives imported successfuly ${JSON.stringify(result)}`)
             //return result
-            req.trips = result;
+            req.drives = result;
             next();
         }
       });
@@ -161,5 +161,6 @@ module.exports = {
     getUtilisation,
     getUnits,
     getFleet,
-    getFleetStatus
+    getFleetStatus,
+    getSpeeding
 }

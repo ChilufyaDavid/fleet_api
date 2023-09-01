@@ -20,28 +20,47 @@ const getFleet = () => {
 //add trips
 function addTrip(data) {
     //console.log(`INSERT DATA ${data}`)
+    let count = 0;
     dbConn.query('INSERT INTO drives SET ?', data, function(error, result){
         if(error){
             //send back error
             console.log(`Error inserting drives ${error}`)
         }else{
             //send back success
-            console.log("Success")
+            console.log("Trip Success")
+            console.log(count++)
+        }
+    });
+}  
+
+function getTrips() { //drives
+    //console.log(`INSERT DATA ${data}`)
+    let count = 0;
+    dbConn.query('INSERT INTO drives SET ?', data, function(error, result){
+        if(error){
+            //send back error
+            console.log(`Error inserting drives ${error}`)
+        }else{
+            //send back success
+            console.log("Trip Success")
+            console.log(count++)
         }
     });
 }  
 
 function addDrivesSummary(data) {
     //console.log(`INSERT DATA ${data}`)
+    
     dbConn.query('INSERT INTO utilisation SET ?', data, function(error, result){
         if(error){
             //send back error
             console.log(`Error inserting drives ${error}`)
         }else{
             //send back success
-            console.log("Success")
+            console.log("Drive Summary Success")
         }
     });
+    //dbConn.end();
 }  
 
 function addParking(data) {
@@ -52,10 +71,53 @@ function addParking(data) {
             console.log(`Error inserting parking ${error}`)
         }else{
             //send back success
-            console.log("Success")
+            console.log("Parking Success")
         }
     });
 }  
+
+//add trips
+function addBatch(data) {
+    //console.log(`INSERT DATA ${data}`)
+    dbConn.query('INSERT INTO unit_batches (batch_name, batches) VALUES (?, ?)', [data.batch_name, JSON.stringify(data.batches)], function(error, result){
+        if(error){
+            //send back error
+            console.log(`Error inserting batch ${error}`)
+        }else{
+            //send back success
+            console.log("Bacht insert Success")
+            console.log(data)
+        }
+    });
+} 
+
+//add geofence
+function addGeofence(data) {
+    //console.log(`INSERT DATA ${data}`)
+    dbConn.query('INSERT INTO geofences (name, description, points) VALUES (?,?,?)', [data.name, data.description,JSON.stringify(data.points)], function(error, result){
+        if(error){
+            //send back error
+            console.log(`Error inserting geofence ${error}`)
+        }else{
+            //send back success
+            console.log("geofence insert Success")
+        }
+    });
+}   
+//update parking with Geofence
+function updateParking(id, location) {
+    const updateQuery = 'UPDATE parking SET location = ?, location_status = ? WHERE id = ?';
+
+    dbConn.query(updateQuery, [location,"Designated",id], function(error, result){
+        if(error){
+            //send back error
+            console.log(`Error inserting geofence ${error}`)
+        }else{
+            //send back success
+            console.log("parking update Success")
+        }
+    });
+}
 
 // APIs
 
@@ -80,5 +142,8 @@ module.exports = {
     getFleet,
     addParking,
     addDrivesSummary,
-    apiUtilityDrives
+    apiUtilityDrives,
+    addBatch,
+    addGeofence,
+    updateParking
 }

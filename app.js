@@ -10,7 +10,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var { bgsAPI} = require('./api/bgsAPI');
 var units = require('./api/units') 
-var { processTrips } = require('./controllers/fleetController')
+var { processTrips, getTrips, getUnits, getUnitBatches,updateData,
+  checkTripsInGeofences,manuallyAddDrives } = require('./controllers/fleetController')
 var { fetchBGSToken } = require('./services/bgsService')
 var app = express();
 
@@ -26,15 +27,26 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(async function(req, res, next){
-  const token = await fetchBGSToken();
-  await processTrips(token.data, "2023-08-13") //yyyy/mm/dd
-  console.log(token);
-  /* let weeks = ["2023-08-07","2023-08-08","2023-08-09","2023-08-10","2023-08-11","2023-08-12","2023-08-13"]
+  //const token = await fetchBGSToken();
+  //await processTrips(token.data, "2023-08-17") //yyyy/mm/dd
+  //getUnitBatches
+  await  processTrips("2023-08-18"); //for trips, pull by day for now
+  //await getUnits() //yyyy/mm/dd //for batches
+  //await processTrips("2023-08-16")
+  //await getGeofences(token.data)
+  //console.log(token);
+  //manuallyAddDrives("2023-08-25")
+  //checkTripsInGeofences()
+  
+/*
+  let weeks = ["2023-08-07","2023-08-08","2023-08-09","2023-08-10","2023-08-11","2023-08-12","2023-08-13"]
   for(const index in weeks){
     const token = await fetchBGSToken();
     await processTrips(token.data, weeks[index]) //yyyy/mm/dd
     console.log(`Done week ${index}`);
   } */
+
+  //updateData();
   next()
 })
 
@@ -62,7 +74,7 @@ cron.schedule('* * * * *', () => {
    // authID: 'Zamtel',
     //authPassword: 'Zamtel@123'
   //})
-  console.log(`running a task every minute since ${counter++} minutes ago`);
+ // console.log(`running a task every minute since ${counter++} minutes ago`);
 });
 
 module.exports = app;

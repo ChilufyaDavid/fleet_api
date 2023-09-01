@@ -11,10 +11,10 @@ fleetRouter.get('/fleet_status', getFleetStatus, (req, res, next) => {
     res.json(req.fleet_status);
 })
 
-fleetRouter.get('/trips', getTrips, (req, res, next) => {
+fleetRouter.get('/drives', getTrips, (req, res, next) => {
     //res.send("Fleet Route")
     //console.log(JSON.stringify(req.trips))
-    res.json(req.trips);
+    res.json(req.drives);
 })
 
 fleetRouter.get('/parkings',getParkings, (req, res, next) => {

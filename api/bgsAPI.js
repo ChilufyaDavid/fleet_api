@@ -24,16 +24,19 @@ async function bgsAuth(creds) {
   }
 }
 
-async function fetchDataFromExternalAPI(accessToken, unitId, date){
+async function fetchDataFromExternalAPI(accessToken, unitIds, date){
   try {
-    var response = await axiosInstance.post('reports/get-reports',{
+    var response = await axiosInstance.post('reports/get-multiple-reports',{
       "from":date.from,//"2023-07-15",
       "to": date.to,//date.to,
-      "unitId":Number(unitId)
+      "unitIds":unitIds
     },{
       headers: { Authorization: `Bearer ${accessToken}`,'Content-Type': 'application/json'},
     });
-    console.log(`Drives fetched successfully ${response.data }, drives : ${response.data.data.drives }`);
+    console.log('Drives fetched successfully');
+    //console.log(response.data.data);
+    //console.log('Drives, total drives : ');
+    //console.log(response.data.data.drives.length);
     // console.log('Response data:', jsonData);
     // ... your code to process JSON data
     return response.data  
@@ -54,7 +57,40 @@ async function fetchDataFromExternalAPI(accessToken, unitId, date){
  
 }
 
+async function fetchDataFromExternalAPIGeofence(accessToken, gIds){
+  try {
+    var response = await axiosInstance.post('reports/get-geofence-report',{
+      
+      "geofenceIds":gIds
+    },{
+      headers: { Authorization: `Bearer ${accessToken}`,'Content-Type': 'application/json'},
+    });
+    console.log('Geofences fetched successfully');
+    //console.log(response.data.data);
+    //console.log('Drives, total drives : ');
+    //console.log(response.data.data.drives.length);
+    // console.log('Response data:', jsonData);
+    // ... your code to process JSON data
+    return response.data.data 
+  }catch(error){
+    // Handle the error
+    if (error.response) {
+      // The server responded with a status code and data
+      console.log('Drives: Server responded with status:', error.response.status);
+      console.log('Drives: Response data:', error.response.data);
+    } else if (error.request) {
+      // The request was made, but no response was received
+      console.log('Drives: No response received from the server.');
+    } else {
+      // Something else went wrong
+      console.log('Drives: Error:', error.message);
+    }
+  }
+ 
+}
+
 module.exports = {
     bgsAuth,
-    fetchDataFromExternalAPI
+    fetchDataFromExternalAPI,
+    fetchDataFromExternalAPIGeofence
 }

@@ -40,6 +40,21 @@ function getWeekNumber(date) {
   return weekNumber;
 }
 
+function compareDateStrings(dateString1, dateString2) {
+  const [year1, month1, day1] = dateString1.split('-');
+  const [year2, month2, day2] = dateString2.split('-');
+
+  const date1 = new Date(parseInt(year1), parseInt(month1 - 1), parseInt(day1)); // Month is 0-based in Date object
+  const date2 = new Date(parseInt(year2), parseInt(month2 - 1), parseInt(day2));
+  if (date1 < date2) {
+    return false; // dateString1 is before dateString2
+  } else if (date1 > date2) {
+    return false;  // dateString1 is after dateString2
+  } else {
+    return true;  // dateString1 is equal to dateString2
+  }
+}
+
 module.exports = {
     convertDateFormat,
     mySqlDateFormat,
@@ -47,5 +62,6 @@ module.exports = {
     secondsToTime,
     timeToMinutes,
     minutesToTime,
-    getWeekNumber
+    getWeekNumber,
+    compareDateStrings
 }
