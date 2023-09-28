@@ -3,8 +3,8 @@ const { bgsAuth, fetchDataFromExternalAPI } = require('../api/bgsAPI')
 const fetchBGSToken = async function () {
   try {
     const token = await bgsAuth({
-      authID: 'Zamtel',
-      authPassword: 'Zamtel@123'
+      authID: '', //replace username
+      authPassword: '' //replace password
     })
     console.log(`TOKEN OKAY ${token}`)
     return {

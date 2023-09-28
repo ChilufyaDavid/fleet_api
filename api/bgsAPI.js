@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const BASE_URL = 'https://apis.bgsgroup.co.zm/gps/';
+const BASE_URL = ''; // Replace API
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL
