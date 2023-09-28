@@ -1,4 +1,3 @@
-
 /** 
 const polygons = [
     {
@@ -57,37 +56,39 @@ const polygons = [
 
 */
 
-function isPointInPolygon(point, polygons){
-    for (index in polygons){
-        if(checkPolygon(point, JSON.parse(polygons[index].points))){ 
-            return polygons[index].name;
-        }
+function isPointInPolygon (point, polygons) {
+  for (index in polygons) {
+    if (checkPolygon(point, JSON.parse(polygons[index].points))) {
+      return polygons[index].name
     }
+  }
 
-    return false
+  return false
 }
 
-function checkPolygon(pointString, polygon) {
-    let point = pointString.split(',').map(parseFloat)
-    const x = point[0];
-    const y = point[1];
-    let isInside = false;
-  
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      const xi = polygon[i][0], yi = polygon[i][1];
-      const xj = polygon[j][0], yj = polygon[j][1];
-  
-      const intersect = ((yi > y) !== (yj > y)) &&
-                        (x < ((xj - xi) * (y - yi) / (yj - yi)) + xi);
-  
-      if (intersect) {
-        isInside = !isInside;
-      }
+function checkPolygon (pointString, polygon) {
+  let point = pointString.split(',').map(parseFloat)
+  const x = point[0]
+  const y = point[1]
+  let isInside = false
+
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i][0],
+      yi = polygon[i][1]
+    const xj = polygon[j][0],
+      yj = polygon[j][1]
+
+    const intersect =
+      yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi
+
+    if (intersect) {
+      isInside = !isInside
     }
-  
-    return isInside;
+  }
+
+  return isInside
 }
 
 module.exports = {
-    isPointInPolygon
+  isPointInPolygon
 }

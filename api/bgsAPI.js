@@ -25,6 +25,8 @@ async function bgsAuth(creds) {
 }
 
 async function fetchDataFromExternalAPI(accessToken, unitIds, date){
+  //console.log('Token:', accessToken);
+  //console.log('unitIds:', unitIds);
   try {
     var response = await axiosInstance.post('reports/get-multiple-reports',{
       "from":date.from,//"2023-07-15",
@@ -33,7 +35,7 @@ async function fetchDataFromExternalAPI(accessToken, unitIds, date){
     },{
       headers: { Authorization: `Bearer ${accessToken}`,'Content-Type': 'application/json'},
     });
-    console.log('Drives fetched successfully');
+    //console.log('Drives fetched successfully');
     //console.log(response.data.data);
     //console.log('Drives, total drives : ');
     //console.log(response.data.data.drives.length);

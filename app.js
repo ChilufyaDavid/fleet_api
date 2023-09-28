@@ -7,12 +7,11 @@ var logger = require('morgan');
 var cron = require('node-cron');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var { bgsAPI} = require('./api/bgsAPI');
-var units = require('./api/units') 
-var { processTrips, getTrips, getUnits, getUnitBatches,updateData,
-  checkTripsInGeofences,manuallyAddDrives } = require('./controllers/fleetController')
-var { fetchBGSToken } = require('./services/bgsService')
+const { runDrives, getDrives } = require('./controllers/TripsController')
+const { unitBatches } = require('./services/tripsService')
+var { fetchBGSToken } = require('./services/bgsService');
+
+
 var app = express();
 
 //var bgsAuth = 
@@ -26,32 +25,13 @@ app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(async function(req, res, next){
-  //const token = await fetchBGSToken();
-  //await processTrips(token.data, "2023-08-17") //yyyy/mm/dd
-  //getUnitBatches
-  await  processTrips("2023-08-18"); //for trips, pull by day for now
-  //await getUnits() //yyyy/mm/dd //for batches
-  //await processTrips("2023-08-16")
-  //await getGeofences(token.data)
-  //console.log(token);
-  //manuallyAddDrives("2023-08-25")
-  //checkTripsInGeofences()
-  
-/*
-  let weeks = ["2023-08-07","2023-08-08","2023-08-09","2023-08-10","2023-08-11","2023-08-12","2023-08-13"]
-  for(const index in weeks){
-    const token = await fetchBGSToken();
-    await processTrips(token.data, weeks[index]) //yyyy/mm/dd
-    console.log(`Done week ${index}`);
-  } */
+app.use( function(req, res, next){
 
   //updateData();
   next()
 })
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -63,18 +43,27 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
+ 
+  
+  console.log(`Current Date: ${year}-${month}-${day}`);
+  //console.log(convertDateFormat(currentDate));
   // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
-var counter = 1;
-cron.schedule('* * * * *', () => {
- // await bgsAPI.bgsAuth({
-   // authID: 'Zamtel',
-    //authPassword: 'Zamtel@123'
-  //})
- // console.log(`running a task every minute since ${counter++} minutes ago`);
+
+cron.schedule('0 07 * * *', async () => {
+  const currentDate = new Date();
+  const yesterday = new Date(currentDate)
+  yesterday.setDate(today.getDate() - 1);
+  const year = yesterday.getFullYear();
+  const month = yesterday.getMonth() + 1; // Months are 0-based, so add 1
+  const day = yesterday.getDate();
+  let req = {batches:[]};
+  unitBatches(req)
+  const token = await fetchBGSToken()
+  runDrives(req.batches, token, `${year}-${month}-${day}`, getDrives)
+  console.log(`Update task running on this date; ${year}-${month}-${day}` )
 });
 
 module.exports = app;

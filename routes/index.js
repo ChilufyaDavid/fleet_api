@@ -1,22 +1,22 @@
 var express = require('express');
-var homeRoute = require('./homeRoute');
-var bgsRouter = require('./bgsRoute')
 var fleetRouter = require('./fleetRoute');
+var fuelRouter = require('./fuelRoute');
+var tripsRouter = require('./tripsRoute');
 
 var router = express.Router();
 
 const defaultRoutes = [
   {
-    path : '/',
-    route: homeRoute
+    path: '/fleet',
+    route: fleetRouter
+  },
+  {
+    path: '/fuel',
+    route: fuelRouter
   },
   {
     path: '/trips',
-    route: bgsRouter
-  },
-  {
-    path: '/fleet',
-    route: fleetRouter
+    route: tripsRouter
   }
 ]
 
